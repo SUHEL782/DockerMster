@@ -3,89 +3,103 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Signup() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "",
+  });
+
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); 
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    setError("");
+    setSuccess("");
 
-    const { username, email, password, role } = event.target;
+    try {
+      const res = await axios.post("http://localhost:3000/user/signup", formData);
+      
+      console.log("Signup Response:", res.data); // Log API response
 
-    
-    axios.post("https://back-end-intragation.onrender.com/user/signup", {
-        username: username.value,
-        email: email.value,
-        password: password.value,
-        role: role.value,
-      })
-      .then((res) => {
-        const data = res.data;
-        localStorage.setItem("token", data.token);
-        navigate("/");
-      })
-      .catch((error) => {
-        setError(error.response?.data?.message || "Signup failed");
-      });
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        setSuccess("Signup successful! Redirecting...");
+        setTimeout(() => navigate("/"), 2000); // Redirect after delay
+      } else {
+        setError("Signup successful, but no token received.");
+      }
+    } catch (error) {
+      console.error("Signup Error:", error.response?.data || error);
+      setError(error.response?.data?.message || "Signup failed. Please try again.");
+    }
   };
 
   return (
     <main className="w-full h-screen flex justify-center items-center bg-gray-900 text-white">
-      <form
-        className="bg-gray-800 p-6 rounded-lg shadow-lg w-80"
-        onSubmit={handleFormSubmit}
-      >
+      <form className="bg-gray-800 p-6 rounded-lg shadow-lg w-80" onSubmit={handleFormSubmit}>
         <h1 className="text-2xl font-bold mb-4 text-center">Signup</h1>
 
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {success && <p className="text-green-500 text-sm text-center">{success}</p>}
 
         <div className="flex flex-col space-y-3">
-          <label htmlFor="username" className="text-sm">
-            Username
-          </label>
+          <label htmlFor="username" className="text-sm">Username</label>
           <input
             className="p-2 rounded-md bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             type="text"
             name="username"
             id="username"
+            value={formData.username}
+            onChange={handleChange}
             placeholder="Enter your username"
             required
           />
 
-          <label htmlFor="email" className="text-sm">
-            Email
-          </label>
+          <label htmlFor="email" className="text-sm">Email</label>
           <input
             className="p-2 rounded-md bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             type="email"
             name="email"
             id="email"
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Enter your email"
             required
           />
 
-          <label htmlFor="password" className="text-sm">
-            Password
-          </label>
+          <label htmlFor="password" className="text-sm">Password</label>
           <input
             className="p-2 rounded-md bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             type="password"
             name="password"
             id="password"
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Enter your password"
+            autoComplete="off"
             required
           />
 
-          <label htmlFor="role" className="text-sm">
-            Role
-          </label>
-          <input
-            className="p-2 rounded-md bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-            type="text"
+          <label htmlFor="role" className="text-sm">Role</label>
+          <select
             name="role"
             id="role"
-            placeholder="Enter your role"
+            value={formData.role}
+            onChange={handleChange}
+            className="p-2 rounded-md bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500"
             required
-          />
+          >
+            <option value="">Select Role</option>
+            <option value="user">user</option>
+            <option value="seller">seller</option>
+          </select>
         </div>
 
         <button
