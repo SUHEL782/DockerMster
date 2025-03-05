@@ -26,12 +26,12 @@ function Signup() {
     try {
       const res = await axios.post("http://localhost:3000/user/signup", formData);
       
-      console.log("Signup Response:", res.data); // Log API response
+      console.log("Signup Response:", res.data); 
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         setSuccess("Signup successful! Redirecting...");
-        setTimeout(() => navigate("/"), 2000); // Redirect after delay
+        setTimeout(() => navigate("/"), 2000); 
       } else {
         setError("Signup successful, but no token received.");
       }
