@@ -8,7 +8,7 @@ export default function Home() {
 
   function getProducts() {
     axios
-      .get("http://localhost:3000/user/products", {
+      .get("https://cloud.mongodb.com/v2/6788ee2d132844301b7a1958#/security/network/accessList", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
